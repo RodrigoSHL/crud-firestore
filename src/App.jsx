@@ -3,8 +3,10 @@ import {firebase} from './firebase';
 
 function App() {
 
-  const [tareas, setTareas] = useState([])
-  const [tarea, setTarea] = useState('')
+  const [tareas, setTareas] = useState([]);
+  const [tarea, setTarea] = useState('');
+  const [editionMode, setEditionMode] = useState(false);
+  const [idTaskState, setIdTaskState] = useState('');
 
   useEffect(() => {
     const getData = async () => {
@@ -20,7 +22,7 @@ function App() {
     getData();
   }, [])
 
-  const add = async (e) => {
+  const addTask = async (e) => {
     e.preventDefault();
     if(!tarea.trim()){
       console.log('error, task is empty')
@@ -31,7 +33,7 @@ function App() {
       const db = firebase.firestore()
       const newTask = {
         name: tarea,
-        fecha: Date.now()
+        date: Date.now()
       }
 
       const data = await db.collection('tasks').add(newTask);
@@ -45,12 +47,12 @@ function App() {
     }
   }
 
-  const deleteData = async (idTask) => {
+  const deleteData = async (id) => {
     try {
       const db = firebase.firestore();
-      await db.collection('tasks').doc(idTask).delete();
+      await db.collection('tasks').doc(id).delete();
       
-      const arrayFilter = tareas.filter(item => item.id !== idTask);
+      const arrayFilter = tareas.filter(item => item.id !== idTaskState);
       setTareas(arrayFilter);
 
     } catch (error) {
@@ -58,8 +60,34 @@ function App() {
     }
   }
 
-  const editData = item => {
-    
+  const handleEditMode = item => {
+    setEditionMode(true);
+    setTarea(item.name);
+    setIdTaskState(item.id);
+    console.log('itemId',idTaskState)
+  }
+
+  const editTask = async (e) => {
+    e.preventDefault();
+    if(!tarea.trim()){
+      console.log('not add task')
+      return
+    }
+    try {
+      const db = firebase.firestore();
+      await db.collection('tasks').doc(idTaskState).update({
+        name:tarea
+      });
+      const arrayEdit = tareas.map(item => (
+        item.id === idTaskState ? {id: item.id, date: item.date, name: tarea} : item
+      ))
+      setTareas(arrayEdit);
+      setEditionMode(false);
+      setTarea('')
+      setIdTaskState('')
+    } catch (error) {
+      console.log('error', error)
+    }
   }
 
   return (
@@ -83,7 +111,7 @@ function App() {
                     Delete
                   </button>
                   <button className="btn btn-warning btn-sm float-end"
-                    onClick={() => editData(item)}                  
+                    onClick={() => handleEditMode(item)}                  
                   >
                     Edit
                   </button>
@@ -96,20 +124,36 @@ function App() {
           </ul>
         </div>
         <div className="col-md-6">
-          <h3>Form</h3>
-          <form onSubmit={add}>
+          <h3>
+            {
+              editionMode ? "Edit Task" : "Add Task"
+            }
+          </h3>
+          <form onSubmit={
+            editionMode ? editTask : addTask
+          }>
             <input 
               type="text" placeholder='add task' 
               className='form-control mb-2'
               onChange={e => setTarea(e.target.value)}
               value={tarea}
             />
-            <button
-              className='btn btn-primary w-100'
-              type='submit'
-            >
-              Add
-            </button>
+            {
+              editionMode ?<button
+                  className='btn btn-warning w-100'
+                  type='submit'
+                >
+                  Edit
+                </button>
+                
+              :
+                <button
+                  className='btn btn-primary w-100'
+                  type='submit'
+                >
+                  Add
+                </button>
+            }
           </form>
         </div>
       </div>
