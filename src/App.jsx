@@ -49,10 +49,11 @@ function App() {
 
   const deleteData = async (id) => {
     try {
+      console.log('id', id)
       const db = firebase.firestore();
       await db.collection('tasks').doc(id).delete();
       
-      const arrayFilter = tareas.filter(item => item.id !== idTaskState);
+      const arrayFilter = tareas.filter(item => item.id !== id);
       setTareas(arrayFilter);
 
     } catch (error) {
