@@ -16,9 +16,6 @@ const Navbar = () => {
                     <NavLink style={{marginRight:"10px"}} className="btn btn-dark" to="/task">
                         Task
                     </NavLink>
-                    <NavLink style={{marginRight:"10px"}} className="btn btn-dark" to="/login">
-                        Login
-                    </NavLink>
                 </div>
             </div>
         </div>

@@ -14,10 +14,8 @@ function App() {
       <Navbar/>
       <div className="container mt-3">
           <Routes>
-            <Route path="/" element={<h1>home</h1>} />
+            <Route path="/" element={<Login/>} />
             <Route path="task" element={<Task />} />
-            <Route path="login" element={<Login />} />
-
           </Routes>
       </div>
     </BrowserRouter>

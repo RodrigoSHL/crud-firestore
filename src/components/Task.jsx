@@ -1,6 +1,6 @@
 import React from 'react'
 import { useEffect, useState } from 'react';
-import {firebase} from '../firebase';
+import {db} from '../firebase';
 
 const Task = () => {
     const [tareas, setTareas] = useState([]);
@@ -11,8 +11,8 @@ const Task = () => {
     useEffect(() => {
       const getData = async () => {
         try {
-          const db = firebase.firestore();
-          const data = await db.collection('tasks').get();
+          const database = db;
+          const data = await database.collection('tasks').get();
           const arrayData = await data.docs.map(doc => ({id: doc.id, ...doc.data()}))
           setTareas(arrayData);
         } catch (error) {
@@ -30,13 +30,13 @@ const Task = () => {
       }
   
       try {
-        const db = firebase.firestore()
+        const database = db
         const newTask = {
           name: tarea,
           date: Date.now()
         }
   
-        const data = await db.collection('tasks').add(newTask);
+        const data = await database.collection('tasks').add(newTask);
         setTarea('');
         setTareas([
           ...tareas,
@@ -50,8 +50,8 @@ const Task = () => {
     const deleteData = async (id) => {
       try {
         console.log('id', id)
-        const db = firebase.firestore();
-        await db.collection('tasks').doc(id).delete();
+        const database = db;
+        await database.collection('tasks').doc(id).delete();
         
         const arrayFilter = tareas.filter(item => item.id !== id);
         setTareas(arrayFilter);
@@ -75,8 +75,8 @@ const Task = () => {
         return
       }
       try {
-        const db = firebase.firestore();
-        await db.collection('tasks').doc(idTaskState).update({
+        const database = db;
+        await database.collection('tasks').doc(idTaskState).update({
           name:tarea
         });
         const arrayEdit = tareas.map(item => (
