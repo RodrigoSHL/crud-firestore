@@ -16,13 +16,17 @@ function App() {
 
   useEffect(() => {
     auth.onAuthStateChanged(user => {
-      console.log('user', user)
+      if(user){
+        setFirebaseUser(user)
+      } else {
+        setFirebaseUser(null)
+      }
     });
   }, [])
 
-  return (
+  return firebaseUser !== false ? (
     <BrowserRouter>
-      <Navbar/>
+      <Navbar firebaseUser={firebaseUser} />
       <div className="container mt-3">
           <Routes>
             <Route path="task" element={<Task />} />
@@ -34,7 +38,9 @@ function App() {
       </div>
     </BrowserRouter>
 
-  );
+  ) : (
+      <p>Loading...</p>
+  )
 }
 
 export default App;
